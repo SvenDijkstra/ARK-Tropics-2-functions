@@ -19,34 +19,103 @@ global xHealthR := convertPixelX(98.59375)	;right
 global yHealthT :=	convertPixelY(94.58333)	;top
 global yHealthB :=	convertPixelY(98.88889)	;bottom
 
+;F9::
+;;MsgBox yHealthT=%yHealthT%
+;;Sleep, 1000
+;;getHealth()
+;;producePoop()
+;;autoFish()
+;;checkTame()
+;;tameAndrewsarchus()
+;;bloodPackFarm()
+;;checkFood()
+;return
+
+
+checkFood() {
+IfWinNotActive ARK: Survival Evolved
+		{
+			ToolTip, ARK Survival Evolved`nis not active.
+			return
+		}
+	PixelSearch, Px, Py, 2490, 1220, 2535, 1280, 0x7E670A, 50, Fast
+	if (ErrorLevel = 2) {
+		ToolTip, Couldn't find health values.
+		return
+	}
+	else if (ErrorLevel = 1) {
+		producePoop()
+	}	
+	else {
+		foodLevel := 1280 - Py
+		return foodLevel
+	}
+	
+}
+
 F9::
-;MsgBox yHealthT=%yHealthT%
-;Sleep, 1000
-;getHealth()
-;producePoop()
-;autoFish()
-;checkTame()
-;tameAndrewsarchus()
-bloodPackFarm()
-return
+	;IfWinNotActive ARK: Survival Evolved
+	;	return
+	if toggle_tame = 0
+		{
+		SetTimer, bloodPackFarm, 2500
+		toggle_tame = 1
+		ToolTip, BLOOD PACK FARMING, 10, 50, 3
+		}
+	else
+		{
+		toggle_tame = 0
+		SetTimer, bloodPackFarm, off
+		Tooltip, , , , 3
+		}
+	return
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+eatCookedMeat() {
+	if FileExist("D:\01-Scripts\Images\CookedMeat.bmp")
+	ImageSearch, FoundX, FoundY, 148, 288, 925, 1270, *15 D:\01-Scripts\Images\CookedMeat.bmp
+	if (ErrorLevel = 0)
+	{
+		MouseMove, %FoundX%, %FoundY%
+		Sleep, 200
+		SendInput, {e}
+	}
+	return
+}
+
 
 bloodPackFarm() {
 	IfWinActive ARK: Survival Evolved
 	{	
-		getHealth()
-		;D:\01-Scripts\Images\BloodPack.png
-		if FileExist("D:\01-Scripts\Images\BloodPack2.bmp")
-		;Run mspaint.exe "D:\01-Scripts\Images\BloodPack.png"
-		;MsgBox A_ScreenWidth=%A_ScreenWidth% A_ScreenHeight=%A_ScreenHeight%
-		ImageSearch, FoundX, FoundY, 148, 288, A_ScreenWidth, A_ScreenHeight, *2 D:\01-Scripts\Images\BloodPack2.bmp
-		if (ErrorLevel = 2)
-			MsgBox Could not conduct the search.
-		else if (ErrorLevel = 1)
-			MsgBox Icon could not be found on the screen.
+		if FileExist("D:\01-Scripts\Images\BP.bmp")
+		ImageSearch, FoundX, FoundY, 148, 288, 925, 1270, *15 D:\01-Scripts\Images\BP.bmp
+		if (ErrorLevel = 0)
+		{
+			MouseMove, %FoundX%, %FoundY%
+			Sleep, 200
+			SendInput, {t}
+		}
 		else
-			ToolTip, Here! %FoundX% %FoundY% , %FoundX%, %FoundY%, 3
-			;MsgBox The icon was found at %FoundX%x%FoundY%
-	
+		{
+			ToolTip, Can't find bloodpack
+			currentHP := getHealth()
+			if ( currentHP > 50 ) {
+				ImageSearch, FoundX, FoundY, 148, 288, 925, 1270, *10 D:\01-Scripts\Images\Syringe.bmp
+				if (ErrorLevel = 0)
+				{
+					MouseMove, %FoundX%, %FoundY%
+					Sleep, 200
+					SendInput, {e}					
+				}
+			}
+			foodlevel := checkFood()
+			ToolTip, CurrentHP = %currentHP%`nfoodlevel = %foodlevel%
+			if ( foodlevel < 30 ) {
+				eatCookedMeat()
+			}
+			producePoop()
+		}
 	}
 	else
 	{
@@ -478,16 +547,19 @@ producePoop() {
 			return
 		}
 	PixelSearch, Px, Py, 2480, 1215, 2540, 1280, 0X736B5A, 10, Fast
-	if (ErrorLevel = 2) {
-		ToolTip, Couldn't find values.
-		return
-	}
-	else if (ErrorLevel = 1) {
-		ToolTip, Dont need to poop
-		return
-	}	
-	else {
-		Send {NumpadAdd}
+	if (ErrorLevel = 0) {
+		ToolTip, POOPING!
+		PixelSearch, Px, Py, 163, 134, 163, 134, 0XFFE780, 3, Fast
+		if (ErrorLevel = 0) {
+			Send {Tab}
+			Sleep, 50
+			Send {NumpadAdd}
+			Sleep, 150
+			Send {f}
+		}
+		else {
+			Send {NumpadAdd}
+		}
 		return
 	}
 	return
@@ -517,7 +589,7 @@ getHealth() {
 			ToolTip, ARK Survival Evolved`nis not active.
 			return
 		}
-	PixelSearch, Px, Py, xHealthL, yHealthT, xHealthR, yHealthB, 0x7E670A, 10, Fast
+	PixelSearch, Px, Py, xHealthL, yHealthT, xHealthR, yHealthB, 0x7E670A, 50, Fast
 	if (ErrorLevel = 2) {
 		ToolTip, Couldn't find health values.
 		return
@@ -529,11 +601,12 @@ getHealth() {
 	else {
 		if %Py% {
 			damage := Py - 1363
-			drawHealth(damage)
+			;drawHealth(damage)
 			damage := damage / 0.62
 			;; shouldnt this be 66? as there are 66 pixels or was this a correct calculation? 1424-1363=61
 			;; changed fropm 61 to 62. Dont ask me why it was just working better, so i guuess it instead of doing caluclations.. im not getting paid here am I?
 			health := 100 - Floor(damage)	
+			return health
 			;MsgBox health=%health%
 			
 		}
