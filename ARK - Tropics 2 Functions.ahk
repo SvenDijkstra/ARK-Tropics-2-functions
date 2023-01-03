@@ -38,7 +38,7 @@ IfWinNotActive ARK: Survival Evolved
 			ToolTip, ARK Survival Evolved`nis not active.
 			return
 		}
-	PixelSearch, Px, Py, 2490, 1220, 2535, 1280, 0x7E670A, 50, Fast
+	PixelSearch, Px, Py, 2487, 1218, 2550, 1284, 0x7E670A, 75, Fast
 	if (ErrorLevel = 2) {
 		ToolTip, Couldn't find health values.
 		return
@@ -546,13 +546,29 @@ producePoop() {
 			Tooltip, Ark not active
 			return
 		}
-	PixelSearch, Px, Py, 2480, 1215, 2540, 1280, 0X736B5A, 10, Fast
+	PixelSearch, Px, Py, 2487, 1218, 2550, 1284, 0X909080, 10, Fast
 	if (ErrorLevel = 0) {
 		ToolTip, POOPING!
 		PixelSearch, Px, Py, 163, 134, 163, 134, 0XFFE780, 3, Fast
 		if (ErrorLevel = 0) {
 			Send {Tab}
-			Sleep, 50
+			Sleep, 150
+			Send {NumpadAdd}
+			Sleep, 150
+			Send {f}
+		}
+		else {
+			Send {NumpadAdd}
+		}
+		return
+	}
+	PixelSearch, Px, Py, 2487, 1218, 2550, 1284, 0X999587, 10, Fast
+	if (ErrorLevel = 0) {
+		ToolTip, POOPING!
+		PixelSearch, Px, Py, 163, 134, 163, 134, 0XFFE780, 3, Fast
+		if (ErrorLevel = 0) {
+			Send {Tab}
+			Sleep, 150
 			Send {NumpadAdd}
 			Sleep, 150
 			Send {f}
@@ -589,7 +605,7 @@ getHealth() {
 			ToolTip, ARK Survival Evolved`nis not active.
 			return
 		}
-	PixelSearch, Px, Py, xHealthL, yHealthT, xHealthR, yHealthB, 0x7E670A, 50, Fast
+	PixelSearch, Px, Py, xHealthL, yHealthT, xHealthR, yHealthB, 0x7E670A, 75, Fast
 	if (ErrorLevel = 2) {
 		ToolTip, Couldn't find health values.
 		return
